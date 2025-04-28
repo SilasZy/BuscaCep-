@@ -17,16 +17,28 @@ type DadosCep = {
   siafi: string;
   estado: string;
   uf: string;
-
   
 };
 export default function Home() {
   const [cep, setCep] = useState("");
+
   const [dadosCep, setDadosCep] = useState<DadosCep | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+const maskCep = (value: string) => {
+  return value
+    .replace(/\D/g, "") // Remove caracteres não numéricos
+    .replace(/(\d{5})(\d)/, "$1-$2") // Adiciona o hífen após os 5 primeiros dígitos
+    .replace(/(-\d{3})\d+?$/, "$1"); // Limita a 8 dígitos no total
+};
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const maskedValue = maskCep(value);
+    setCep(maskedValue);
+  };
 
+  
   async function buscarCep(cep: string) {
     try {
       const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
@@ -41,11 +53,11 @@ export default function Home() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
+  
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
-    const cepValue = formData.get("cep") as string;
-
+    let cepValue = formData.get("cep") as string;
+    cepValue = cepValue.replace(/\D/g, "");
     const schema = z.object({
       cep: z.string().length(8, { message: "CEP deve ter 8 dígitos" }),
     });
@@ -66,7 +78,7 @@ export default function Home() {
 
   return (
     <div>
-      <nav className="bg-green-500 dark:bg-gray-900">
+      <nav className="bg-green-400  dark:bg-[#4ade80] ">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <div className="flex items-center">
             <Link href="#" className="flex items-center">
@@ -76,8 +88,9 @@ export default function Home() {
                 height={30}
                 className="h-8 mr-3"
                 alt="BuscaCep Logo"
+                
               />
-              <span className="self-center text-black text-2xl font-semibold whitespace-nowrap dark:text-white">
+              <span className="self-center  text-2xl font-semibold whitespace-nowrap dark:text-black">
                 BuscaCep
               </span>
             </Link>
@@ -97,7 +110,7 @@ export default function Home() {
             className="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-l-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Buscar Cep"
             value={cep}
-            onChange={(e) => setCep(e.target.value)}
+           onChange={handleCepChange}
             required
             
           />
@@ -122,65 +135,55 @@ export default function Home() {
       )}
 
       {openModal && dadosCep && (
-        <div className="modal">
-          <div className="modal-content bg-white mx-auto w-2xl mt-5 p-3 rounded-lg shadow-lg">
+        <div className="modal ">
+          <div className="modal-content bg-white   dark:text-[#080808] mx-auto w-2xl mt-10 p-3 rounded-lg shadow-lg">
             <div className="flex justify-center mt-10">
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-2xl font-bold dark:text-[#080808]">
                 Resultado da Pesquisa do Cep
               </h1>
             </div>
-            <div className="flex flex-row   flex-wrap items-start justify-center mt-5 gap-5">
-              
-              <div className="card p-2  rounded-lg shadow-md">
-                <h2 className="text-xl text-black font-semibold">CEP:</h2>
-                {dadosCep?.cep || 'cep não encontrado'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">logradouro:</h2>
-                {dadosCep?.logradouro || 'Logradouro não encontrado'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">Bairro:</h2>
-                {dadosCep?.bairro || 'Bairro não encontrado'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold"> UF:</h2>
-                {dadosCep?.uf || 'UF não encontrado'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">localidade:</h2>
-                {dadosCep?.localidade || 'Localidade não encontrada'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">DDD:</h2>
-                {dadosCep?.ddd || 'DDD não encontrado'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">Região:</h2>
-                {dadosCep?.regiao || 'Região não encontrada'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">IBGE:</h2>
-                {dadosCep?.ibge || 'Ibge não encontrado'}
-              </div>
-            
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">Siafi:</h2>
-                {dadosCep?.siafi || 'Siafi não encontrado'}
-              </div>
-              <div className="card p-2 bg-white rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold">ESTADO:</h2>
-                {dadosCep?.estado || 'Estado não encontrado'}
-              </div>
-            
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5">
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">CEP:</h2>
+    {dadosCep?.cep || 'cep não encontrado'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">Logradouro:</h2>
+    {dadosCep?.logradouro || 'Logradouro não encontrado'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">Bairro:</h2>
+    {dadosCep?.bairro || 'Bairro não encontrado'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">UF:</h2>
+    {dadosCep?.uf || 'UF não encontrado'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">Localidade:</h2>
+    {dadosCep?.localidade || 'Localidade não encontrada'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">DDD:</h2>
+    {dadosCep?.ddd || 'DDD não encontrado'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">Região:</h2>
+    {dadosCep?.regiao || 'Região não encontrada'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">IBGE:</h2>
+    {dadosCep?.ibge || 'Ibge não encontrado'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">Siafi:</h2>
+    {dadosCep?.siafi || 'Siafi não encontrado'}
+  </div>
+  <div className="p-4 bg-white rounded-lg shadow-md">
+    <h2 className="text-xl font-semibold">ESTADO:</h2>
+    {dadosCep?.estado || 'Estado não encontrado'}
+  </div>
+</div>
             
             <div className="flex justify-center mt-10">
               <button
