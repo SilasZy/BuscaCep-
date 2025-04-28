@@ -2,13 +2,27 @@
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { set, z } from "zod";
+import { useState } from "react";
+import {  z } from "zod";
 
- 
+type DadosCep = {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  ddd: string;
+  regiao: string;
+  ibge: string;
+  siafi: string;
+  estado: string;
+  uf: string;
+
+  
+};
 export default function Home() {
   const [cep, setCep] = useState("");
-  const [dadosCep, setDadosCep] = useState<any>(null);
+  const [dadosCep, setDadosCep] = useState<DadosCep | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,7 +58,6 @@ export default function Home() {
       setLoading(false);
       return;
     }
-
     setCep(cepValue);
     await buscarCep(cepValue);
     setLoading(false);
@@ -83,7 +96,10 @@ export default function Home() {
             id="default-search"
             className="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-l-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Buscar Cep"
+            value={cep}
+            onChange={(e) => setCep(e.target.value)}
             required
+            
           />
           <button
             type="submit"
@@ -117,51 +133,51 @@ export default function Home() {
               
               <div className="card p-2  rounded-lg shadow-md">
                 <h2 className="text-xl text-black font-semibold">CEP:</h2>
-                <p className="text-lg  text-black"> {cep}</p>
+                {dadosCep?.cep || 'cep não encontrado'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">logradouro:</h2>
-                <p className="text-lg"> {dadosCep.logradouro}</p>
+                {dadosCep?.logradouro || 'Logradouro não encontrado'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">Bairro:</h2>
-                <p className="text-lg"> {dadosCep.bairro}</p>
+                {dadosCep?.bairro || 'Bairro não encontrado'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold"> UF:</h2>
-                <p className="text-lg"> {dadosCep.uf}</p>
+                {dadosCep?.uf || 'UF não encontrado'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">localidade:</h2>
-                <p className="text-lg"> {dadosCep.localidade}</p>
+                {dadosCep?.localidade || 'Localidade não encontrada'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">DDD:</h2>
-                <p className="text-lg"> {dadosCep.ddd}</p>
+                {dadosCep?.ddd || 'DDD não encontrado'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">Região:</h2>
-                <p className="text-lg"> {dadosCep.regiao}</p>
+                {dadosCep?.regiao || 'Região não encontrada'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">IBGE:</h2>
-                <p className="text-lg"> {dadosCep.ibge}</p>
+                {dadosCep?.ibge || 'Ibge não encontrado'}
               </div>
             
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">Siafi:</h2>
-                <p className="text-lg"> {dadosCep.siafi}</p>
+                {dadosCep?.siafi || 'Siafi não encontrado'}
               </div>
               <div className="card p-2 bg-white rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold">ESTADO:</h2>
-                <p className="text-lg"> {dadosCep.estado}</p>
+                {dadosCep?.estado || 'Estado não encontrado'}
               </div>
             
             </div>
