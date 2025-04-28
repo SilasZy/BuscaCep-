@@ -1,103 +1,198 @@
+'use client';
+import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { set, z } from "zod";
 
+ 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [cep, setCep] = useState("");
+  const [dadosCep, setDadosCep] = useState<any>(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  async function buscarCep(cep: string) {
+    try {
+      const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+      const dados = response.data;
+      setDadosCep(dados);
+    } catch (err) {
+      console.error("Erro ao buscar CEP", err);
+    }
+  }
+
+  const searchDadosCep = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const cepValue = formData.get("cep") as string;
+
+    const schema = z.object({
+      cep: z.string().length(8, { message: "CEP deve ter 8 dígitos" }),
+    });
+
+    const validation = schema.safeParse({ cep: cepValue });
+
+    if (!validation.success) {
+      setError(validation.error.errors[0].message);
+ 
+      setLoading(false);
+      return;
+    }
+
+    setCep(cepValue);
+    await buscarCep(cepValue);
+    setLoading(false);
+    setOpenModal(true);
+  };
+
+  return (
+    <div>
+      <nav className="bg-green-500 dark:bg-gray-900">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+          <div className="flex items-center">
+            <Link href="#" className="flex items-center">
+              <Image
+                src="/search.svg"
+                width={30}
+                height={30}
+                className="h-8 mr-3"
+                alt="BuscaCep Logo"
+              />
+              <span className="self-center text-black text-2xl font-semibold whitespace-nowrap dark:text-white">
+                BuscaCep
+              </span>
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </nav>
+
+      <form
+        onSubmit={searchDadosCep}
+        className="flex flex-col items-center justify-center mt-10"
+      >
+        <div className="flex mb-2 ">
+          <input
+            name="cep"
+            type="search"
+            id="default-search"
+            className="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-l-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Buscar Cep"
+            required
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <button
+            type="submit"
+            className="text-black  bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg px-6 py-3 transition"
+          >
+     Buscar 
+          </button>
+        </div>
+
+        {error && (
+          <p className="text-red-500 text-sm mt-2 min-h-[1.5rem]">{error}</p>
+        )}
+      </form>
+
+      {loading && (
+        
+        <div className="flex justify-center mt-5">
+          <p className="text-lg font-semibold">Buscando...</p>
+        </div>
+      )}
+
+      {openModal && dadosCep && (
+        <div className="modal">
+          <div className="modal-content bg-white mx-auto w-2xl mt-5 p-3 rounded-lg shadow-lg">
+            <div className="flex justify-center mt-10">
+              <h1 className="text-2xl font-bold">
+                Resultado da Pesquisa do Cep
+              </h1>
+            </div>
+            <div className="flex flex-row   flex-wrap items-start justify-center mt-5 gap-5">
+              
+              <div className="card p-2  rounded-lg shadow-md">
+                <h2 className="text-xl text-black font-semibold">CEP:</h2>
+                <p className="text-lg  text-black"> {cep}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">logradouro:</h2>
+                <p className="text-lg"> {dadosCep.logradouro}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">Bairro:</h2>
+                <p className="text-lg"> {dadosCep.bairro}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold"> UF:</h2>
+                <p className="text-lg"> {dadosCep.uf}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">localidade:</h2>
+                <p className="text-lg"> {dadosCep.localidade}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">DDD:</h2>
+                <p className="text-lg"> {dadosCep.ddd}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">Região:</h2>
+                <p className="text-lg"> {dadosCep.regiao}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">IBGE:</h2>
+                <p className="text-lg"> {dadosCep.ibge}</p>
+              </div>
+            
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">Siafi:</h2>
+                <p className="text-lg"> {dadosCep.siafi}</p>
+              </div>
+              <div className="card p-2 bg-white rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold">ESTADO:</h2>
+                <p className="text-lg"> {dadosCep.estado}</p>
+              </div>
+            
+            </div>
+            
+            <div className="flex justify-center mt-10">
+              <button
+                type="button"
+                onClick={() => setOpenModal(false)}
+                className="bg-red-500 w-full text-white px-4 py-2 rounded font-bold hover:bg-red-600 transition duration-300"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+// {
+//   "cep": "23812-310",
+//   "logradouro": "Rua São João",
+//   "complemento": "",
+//   "unidade": "",
+//   "bairro": "São José",
+//   "localidade": "Itaguaí",
+//   "uf": "RJ",
+//   "estado": "Rio de Janeiro",
+//   "regiao": "Sudeste",
+//   "ibge": "3302007",
+//   "gia": "",
+//   "ddd": "21",
+//   "siafi": "5839"
+// }

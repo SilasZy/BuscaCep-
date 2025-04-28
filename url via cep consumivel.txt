@@ -1,0 +1,19 @@
+ const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+
+ oq me retorna na minha api via cep: 
+ 
+ {
+  "cep": "23812-310",
+  "logradouro": "Rua São João",
+  "complemento": "",
+  "unidade": "",
+  "bairro": "São José",
+  "localidade": "Itaguaí",
+  "uf": "RJ",
+  "estado": "Rio de Janeiro",
+  "regiao": "Sudeste",
+  "ibge": "3302007",
+  "gia": "",
+  "ddd": "21",
+  "siafi": "5839"
+}
