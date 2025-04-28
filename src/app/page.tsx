@@ -189,7 +189,7 @@ const maskCep = (value: string) => {
               <button
                 type="button"
                 onClick={() => setOpenModal(false)}
-                className="bg-red-500 w-full text-white px-4 py-2 rounded font-bold hover:bg-red-600 transition duration-300"
+                className="bg-red-500 w-full text-white px-4 py-2  cursor-pointer rounded font-bold hover:bg-red-600 transition duration-300"
               >
                 Fechar
               </button>
