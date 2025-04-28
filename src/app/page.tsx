@@ -78,7 +78,7 @@ const maskCep = (value: string) => {
 
   return (
     <div>
-      <nav className="bg-green-400  dark:bg-[#4ade80] ">
+      <nav className="bg-green-400  sm:mx-auto dark:bg-[#4ade80] ">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <div className="flex items-center">
             <Link href="#" className="flex items-center">
@@ -136,7 +136,7 @@ const maskCep = (value: string) => {
 
       {openModal && dadosCep && (
         <div className="modal ">
-          <div className="modal-content bg-white   dark:text-[#080808] mx-auto w-2xl mt-10 p-3 rounded-lg shadow-lg">
+          <div className="modal-content bg-white   dark:text-[#080808] mx-auto  lg:w-2xl mt-10 p-3 rounded-lg shadow-lg">
             <div className="flex justify-center mt-10">
               <h1 className="text-2xl font-bold dark:text-[#080808]">
                 Resultado da Pesquisa do Cep
